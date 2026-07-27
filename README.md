@@ -38,3 +38,13 @@ Configura `.env` con `DATABASE_URL`, `DIRECT_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `
 ## Integraciones futuras
 
 La app deja puntos preparados para Meta Ads, Google Ads, analytics y agentes de IA. Los endpoints actuales responden con datos mock cuando no hay base de datos, para permitir desarrollo visual inmediato.
+
+## Auditor de contenido
+
+Para auditar que el sitio siga alineado con el Excel de precios y la oferta comercial Telcel:
+
+```bash
+python tools/audit_site_content.py
+```
+
+El auditor regenera una interpretación temporal del Excel, la compara contra `public/data/catalogo-excel.json`, revisa la campaña Telcel en `lib/telcel-offers.ts` y genera reportes en `reports/`.

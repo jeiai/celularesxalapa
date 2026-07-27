@@ -1,0 +1,139 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADVISOR
+  MANAGER
+  ADMIN
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  WON
+  LOST
+}
+
+enum AppointmentStatus {
+  REQUESTED
+  CONFIRMED
+  COMPLETED
+  CANCELED
+}
+
+model UserProfile {
+  id        String   @id @default(cuid())
+  authId    String   @unique
+  email     String   @unique
+  name      String?
+  phone     String?
+  role      Role     @default(CUSTOMER)
+  leads     Lead[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Device {
+  id          String   @id @default(cuid())
+  brand       String
+  model       String
+  slug        String   @unique
+  price       Int
+  storage     String
+  camera      String
+  battery     String
+  condition   String   @default("Nuevo")
+  stock       Int      @default(0)
+  featured    Boolean  @default(false)
+  imageUrl    String?
+  promotions  Promotion[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String
+  carrier     String
+  monthlyFee  Int
+  dataGb      Int
+  benefits    String[]
+  active      Boolean  @default(true)
+  promotions  Promotion[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Promotion {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  startsAt    DateTime
+  endsAt      DateTime
+  active      Boolean  @default(true)
+  deviceId    String?
+  planId      String?
+  device      Device?  @relation(fields: [deviceId], references: [id])
+  plan        Plan?    @relation(fields: [planId], references: [id])
+}
+
+model Lead {
+  id          String     @id @default(cuid())
+  name        String
+  phone       String
+  email       String?
+  interest    String
+  status      LeadStatus @default(NEW)
+  source      String     @default("web")
+  notes       String?
+  ownerId     String?
+  owner       UserProfile? @relation(fields: [ownerId], references: [id])
+  appointment Appointment?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  leadId    String            @unique
+  lead      Lead              @relation(fields: [leadId], references: [id])
+  startsAt  DateTime
+  status    AppointmentStatus @default(REQUESTED)
+  channel   String            @default("WhatsApp")
+  createdAt DateTime          @default(now())
+}
+
+model Quote {
+  id          String   @id @default(cuid())
+  deviceSlug  String
+  planId      String?
+  downPayment Int
+  months      Int
+  monthlyPay  Int
+  total       Int
+  leadPhone   String?
+  aiSummary   String?
+  createdAt   DateTime @default(now())
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String
+  published   Boolean  @default(false)
+  seoTitle    String?
+  seoDesc     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

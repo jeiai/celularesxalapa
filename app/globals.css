@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 224 12% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 12% 9%;
+  --primary: 216 100% 52%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 214 100% 96%;
+  --secondary-foreground: 216 92% 36%;
+  --muted: 220 27% 96%;
+  --muted-foreground: 220 8% 43%;
+  --accent: 357 78% 52%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 357 78% 52%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 220 20% 91%;
+  --input: 220 20% 91%;
+  --ring: 216 100% 52%;
+  --radius: 0.5rem;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+.section-pad {
+  @apply px-4 py-16 md:px-8 md:py-24;
+}
+
+.cx-gradient {
+  background:
+    radial-gradient(circle at 82% 22%, rgba(10, 102, 255, 0.14), transparent 28%),
+    radial-gradient(circle at 7% 78%, rgba(229, 37, 42, 0.12), transparent 25%),
+    linear-gradient(180deg, #ffffff 0%, #f7f9fd 100%);
+}

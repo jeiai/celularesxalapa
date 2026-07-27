@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
 
 export function AppointmentForm() {
   const [message, setMessage] = useState("");
@@ -26,7 +26,7 @@ export function AppointmentForm() {
       <div className="container grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
         <div>
           <p className="mb-3 text-xs font-extrabold uppercase text-primary">Agenda una cita</p>
-          <h2 className="text-4xl font-extrabold md:text-6xl">Convierte interés en conversación.</h2>
+          <h2 className="text-4xl font-extrabold md:text-6xl">Convierte interes en conversacion.</h2>
           <p className="mt-4 text-muted-foreground">
             El formulario crea leads por API REST y queda preparado para notificaciones por WhatsApp Business.
           </p>
@@ -40,6 +40,7 @@ export function AppointmentForm() {
               <Select name="interest">
                 <option>Comprar celular</option>
                 <option>Contratar plan</option>
+                <option>Portabilidad / Oferta Telcel</option>
                 <option>Portabilidad</option>
                 <option>Internet / Telmex</option>
                 <option>Soporte de compra</option>

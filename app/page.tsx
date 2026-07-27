@@ -7,11 +7,13 @@ import { Hero } from "@/components/sections/hero";
 import { PlansAndOperations } from "@/components/sections/operations";
 import { PromotionsSection } from "@/components/sections/promotions";
 import { QuoteTool } from "@/components/sections/quote-tool";
+import { TelcelOfferHighlight } from "@/components/sections/telcel-offer-highlight";
 
 export default function HomePage() {
   return (
     <main>
       <Hero />
+      <TelcelOfferHighlight />
       <CatalogSection />
       <PromotionsSection />
       <PlansAndOperations />

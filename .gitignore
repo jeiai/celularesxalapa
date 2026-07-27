@@ -16,7 +16,9 @@ pnpm-debug.log*
 desktop-check.png
 mobile-check.png
 precios-check.png
+ofertas-telcel-check.png
 
 .vercel/
+.codex-remote-attachments/
 .DS_Store
 Thumbs.db

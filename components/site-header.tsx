@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const nav = [
   ["Catalogo", "/#catalogo"],
+  ["Precios Excel", "/precios"],
   ["Comparador", "/#comparador"],
   ["Cotizador", "/#cotizador"],
   ["Dashboard", "/dashboard"],

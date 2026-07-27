@@ -15,6 +15,7 @@ pnpm-debug.log*
 
 desktop-check.png
 mobile-check.png
+precios-check.png
 
 .vercel/
 .DS_Store

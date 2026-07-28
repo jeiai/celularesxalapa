@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 const nav = [
   ["Catalogo", "/#catalogo"],
   ["Equipos", "/precios"],
-  ["Ofertas Telcel", "/ofertas-telcel"],
+  ["Cambiate a Telcel", "/ofertas-telcel"],
   ["Comparador", "/#comparador"],
   ["Asesor", "/#cotizador"],
   ["Dashboard", "/dashboard"],
@@ -49,7 +49,7 @@ export function SiteHeader() {
           <Button asChild variant="dark" size="sm">
             <Link href="/agenda">
               <CalendarDays className="mr-2 size-4" />
-              Agenda
+              Agenda Cita
             </Link>
           </Button>
         </nav>

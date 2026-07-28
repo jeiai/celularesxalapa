@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Truck } from "lucide-react";
+import { ArrowRight, BadgeCheck, CalendarDays, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Hero() {
@@ -13,16 +13,19 @@ export function Hero() {
             Tu tienda digital para celulares, planes e internet.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Catálogo, cotizador inteligente, agenda, CRM y panel administrativo listos para operar y convertir mejor.
+            Catalogo publico de marcas y modelos, agenda con asesores, CRM y panel administrativo listos para operar y convertir mejor.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg">
-              <Link href="#cotizador">
-                Cotizar ahora <ArrowRight className="ml-2 size-5" />
+              <Link href="/precios">
+                Ver catalogo <ArrowRight className="ml-2 size-5" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <Link href="#catalogo">Ver catálogo</Link>
+              <Link href="/agenda">
+                <CalendarDays className="mr-2 size-5" />
+                Agendar cita
+              </Link>
             </Button>
           </div>
           <div className="mt-7 flex flex-wrap gap-3 text-sm font-bold">
@@ -47,8 +50,8 @@ export function Hero() {
             className="rounded-[2rem] shadow-retail"
           />
           <div className="absolute bottom-8 right-4 rounded-2xl border bg-white/90 p-4 shadow-retail backdrop-blur">
-            <span className="block text-xs font-bold text-muted-foreground">Desde</span>
-            <strong className="text-2xl">$399/mes</strong>
+            <span className="block text-xs font-bold text-muted-foreground">Siguiente paso</span>
+            <strong className="text-2xl">Asesor personal</strong>
           </div>
         </div>
       </div>

@@ -1,33 +1,43 @@
 import argparse
-import importlib.util
 import json
 import re
 import subprocess
 import sys
-from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
 
-DEFAULT_EXCEL = Path(r"C:\Users\CORE\Documents\celularesxalapa\V7.10    GENERAL .xlsx")
-DEFAULT_SITE_JSON = Path("public/data/catalogo-excel.json")
-DEFAULT_OFFERS = Path("lib/telcel-offers.ts")
+DEFAULT_EXCEL = Path(r"C:\Users\CORE\Documents\celularesxalapa\equipos v10.xlsx")
+FALLBACK_EXCEL = Path(r"C:\Users\CORE\Documents\celularesxalapa\V7.10    GENERAL .xlsx")
+DEFAULT_SITE_JSON = Path("public/data/equipos-catalogo.json")
 DEFAULT_REPORT_DIR = Path("reports")
 
-EXPECTED_TYPES = {"Prepago", "Postpago", "Accesorios", "Combos", "WiFi Telcel", "ZMA"}
-EXPECTED_OFFER_TERMS = [
-    "Portabilidad Telcel con mas gigas",
-    "Doble de GB",
-    "50% mas gigas",
-    "Planes Telcel Ultra",
-    "Planes Telcel Libre",
-    "WiFi Telcel",
-    "31 de julio de 2026",
-    "Telcel Ultra Ilimitado",
-    "Libre VIP",
-    "GB ilimitados desde $399",
+PUBLIC_FILES = [
+    Path("app/precios/page.tsx"),
+    Path("app/ofertas-telcel/page.tsx"),
+    Path("app/api/catalog/route.ts"),
+    Path("app/api/quote/route.ts"),
+    Path("components/excel-product-browser.tsx"),
+    Path("components/sections/catalog.tsx"),
+    Path("components/sections/comparison-tool.tsx"),
+    Path("components/sections/quote-tool.tsx"),
+    Path("components/sections/hero.tsx"),
+    Path("components/sections/operations.tsx"),
+    Path("components/sections/promotions.tsx"),
+    Path("components/sections/telcel-offer-highlight.tsx"),
+    Path("components/telcel-offer-tabs.tsx"),
+    Path("lib/telcel-offers.ts"),
 ]
+
+PROHIBITED_PUBLIC_RE = re.compile(
+    r"(\$[\d,]+|precio|precios|mensual|mensualidad|enganche|costo|costos|pago|pagos|cashback|stock|disponibilidad)",
+    re.IGNORECASE,
+)
+PROHIBITED_CATALOG_KEY_RE = re.compile(
+    r"(precio|mensual|enganche|diferencia|costo|cargo|cashback|iva|stock|disponibilidad|availability)",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -41,163 +51,91 @@ def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def ensure_catalog_from_excel(excel_path: Path, temp_path: Path):
-    extractor = Path("tools/extract_excel_catalog.py")
-    if not extractor.exists():
-        raise FileNotFoundError("Missing tools/extract_excel_catalog.py")
-    command = [sys.executable, str(extractor), str(excel_path), str(temp_path)]
-    subprocess.run(command, check=True, capture_output=True, text=True)
-    return load_json(temp_path)
-
-
-def money(value):
-    return f"${value:,.0f}" if isinstance(value, (int, float)) else "N/D"
-
-
 def norm(value):
     return re.sub(r"\s+", " ", str(value or "").strip()).upper()
 
 
-def index_items(items):
-    return {
-        (
-            norm(item.get("tipo")),
-            norm(item.get("marca")),
-            norm(item.get("modelo")),
-            norm(item.get("categoria")),
-        ): item
-        for item in items
-    }
+def item_key(item):
+    return (
+        norm(item.get("category")),
+        norm(item.get("brand")),
+        norm(item.get("model")),
+        norm(item.get("technology")),
+        norm(item.get("color")),
+    )
 
 
-def compare_catalogs(excel_catalog, site_catalog):
+def resolve_excel(path: Path):
+    if path.exists():
+        return path
+    if path == DEFAULT_EXCEL and FALLBACK_EXCEL.exists():
+        return FALLBACK_EXCEL
+    raise FileNotFoundError(f"Excel not found: {path}")
+
+
+def build_catalog_from_excel(excel_path: Path, output_path: Path):
+    extractor = Path("tools/extract_public_equipment_catalog.py")
+    command = [sys.executable, str(extractor), "--input", str(excel_path), "--output", str(output_path)]
+    subprocess.run(command, check=True, capture_output=True, text=True)
+    return load_json(output_path)
+
+
+def compare_public_catalogs(excel_catalog, site_catalog):
     checks = []
-
-    excel_count = excel_catalog.get("count")
-    site_count = site_catalog.get("count")
     checks.append(
         Check(
-            "Conteo total de productos",
-            "PASS" if excel_count == site_count else "FAIL",
-            f"Excel interpretado: {excel_count}; sitio: {site_count}.",
+            "Conteo de modelos publicos",
+            "PASS" if excel_catalog.get("count") == site_catalog.get("count") else "FAIL",
+            f"Excel: {excel_catalog.get('count')}; sitio: {site_catalog.get('count')}.",
         )
     )
 
-    excel_types = set(excel_catalog.get("filters", {}).get("tipos", []))
-    site_types = set(site_catalog.get("filters", {}).get("tipos", []))
-    missing_types = sorted(EXPECTED_TYPES - site_types)
-    status = "PASS" if excel_types == site_types and not missing_types else "FAIL"
+    excel_keys = {item_key(item) for item in excel_catalog.get("items", [])}
+    site_keys = {item_key(item) for item in site_catalog.get("items", [])}
+    missing = sorted(excel_keys - site_keys)
+    extra = sorted(site_keys - excel_keys)
     checks.append(
         Check(
-            "Tipos comerciales disponibles",
-            status,
-            f"Tipos en sitio: {', '.join(sorted(site_types))}. Faltantes esperados: {', '.join(missing_types) or 'ninguno'}.",
+            "Marcas y modelos alineados al Excel",
+            "PASS" if not missing and not extra else "FAIL",
+            f"Faltantes: {len(missing)}; extras: {len(extra)}.",
         )
     )
 
-    excel_plans = set(excel_catalog.get("filters", {}).get("planes", []))
-    site_plans = set(site_catalog.get("filters", {}).get("planes", []))
-    plan_missing = sorted(excel_plans - site_plans)
+    bad_keys = sorted(
+        {
+            key
+            for item in site_catalog.get("items", [])
+            for key in item.keys()
+            if PROHIBITED_CATALOG_KEY_RE.search(key)
+        }
+    )
     checks.append(
         Check(
-            "Planes postpago/a plazo",
-            "PASS" if not plan_missing else "FAIL",
-            f"Planes en Excel: {len(excel_plans)}; planes en sitio: {len(site_plans)}; faltantes: {len(plan_missing)}.",
+            "JSON publico sin campos economicos",
+            "PASS" if not bad_keys else "FAIL",
+            f"Campos prohibidos: {', '.join(bad_keys) or 'ninguno'}.",
         )
     )
-
-    excel_by_type = Counter(item["tipo"] for item in excel_catalog["items"])
-    site_by_type = Counter(item["tipo"] for item in site_catalog["items"])
-    mismatched = {
-        key: {"excel": excel_by_type[key], "site": site_by_type[key]}
-        for key in sorted(set(excel_by_type) | set(site_by_type))
-        if excel_by_type[key] != site_by_type[key]
-    }
-    checks.append(
-        Check(
-            "Conteo por tipo",
-            "PASS" if not mismatched else "FAIL",
-            json.dumps(mismatched, ensure_ascii=False) if mismatched else dict_to_text(site_by_type),
-        )
-    )
-
-    excel_index = index_items(excel_catalog["items"])
-    site_index = index_items(site_catalog["items"])
-    missing_keys = sorted(set(excel_index) - set(site_index))
-    checks.append(
-        Check(
-            "Productos faltantes por llave tipo/marca/modelo/categoria",
-            "PASS" if not missing_keys else "FAIL",
-            f"Faltantes: {len(missing_keys)}. Muestras: {format_keys(missing_keys[:5])}",
-        )
-    )
-
-    sample_diffs = []
-    for key in sorted(set(excel_index) & set(site_index))[:250]:
-        excel_item = excel_index[key]
-        site_item = site_index[key]
-        for field in ["precioConIva", "precioSinIva"]:
-            if excel_item.get(field) != site_item.get(field):
-                sample_diffs.append(
-                    f"{site_item.get('tipo')} / {site_item.get('marca')} / {site_item.get('modelo')} {field}: "
-                    f"Excel {money(excel_item.get(field))}, sitio {money(site_item.get(field))}"
-                )
-                break
-    checks.append(
-        Check(
-            "Muestra de precios contado",
-            "PASS" if not sample_diffs else "FAIL",
-            "Sin diferencias en muestra de 250 productos." if not sample_diffs else "; ".join(sample_diffs[:5]),
-        )
-    )
-
     return checks
 
 
-def audit_telcel_offer(path: Path):
-    text = path.read_text(encoding="utf-8")
-    checks = []
-    missing_terms = [term for term in EXPECTED_OFFER_TERMS if term not in text]
-    checks.append(
+def audit_public_files(paths):
+    findings = []
+    for path in paths:
+        if not path.exists():
+            continue
+        for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+            visible_line = re.sub(r'href="/precios"', "", line)
+            if PROHIBITED_PUBLIC_RE.search(visible_line):
+                findings.append(f"{path}:{line_number}: {line.strip()}")
+    return [
         Check(
-            "Oferta Telcel - terminos clave",
-            "PASS" if not missing_terms else "FAIL",
-            f"Faltantes: {', '.join(missing_terms) or 'ninguno'}.",
+            "Vistas publicas sin terminos economicos",
+            "PASS" if not findings else "FAIL",
+            "Sin hallazgos." if not findings else "\n".join(findings[:40]),
         )
-    )
-
-    group_ids = re.findall(r'id: "([^"]+)"', text)
-    expected_groups = {"portabilidad-amigo", "smartphone-doble-gb", "telcel-ultra", "telcel-libre", "wifi-telcel"}
-    missing_groups = sorted(expected_groups - set(group_ids))
-    checks.append(
-        Check(
-            "Oferta Telcel - grupos comerciales",
-            "PASS" if not missing_groups else "FAIL",
-            f"Grupos detectados: {', '.join(group_ids)}. Faltantes: {', '.join(missing_groups) or 'ninguno'}.",
-        )
-    )
-
-    price_terms = ["openPrice: 349", "controlledPrice: 399", "openPrice: 1499", "price: 1399"]
-    missing_prices = [term for term in price_terms if term not in text]
-    checks.append(
-        Check(
-            "Oferta Telcel - precios representativos",
-            "PASS" if not missing_prices else "FAIL",
-            f"Faltantes: {', '.join(missing_prices) or 'ninguno'}.",
-        )
-    )
-
-    return checks
-
-
-def dict_to_text(counter):
-    return ", ".join(f"{key}: {counter[key]}" for key in sorted(counter))
-
-
-def format_keys(keys):
-    if not keys:
-        return "ninguna"
-    return " | ".join(" / ".join(value for value in key if value) for key in keys)
+    ]
 
 
 def write_reports(checks, report_dir: Path):
@@ -208,9 +146,9 @@ def write_reports(checks, report_dir: Path):
     passed = sum(1 for check in checks if check.status == "PASS")
     failed = sum(1 for check in checks if check.status == "FAIL")
     payload = {
-      "generatedAt": timestamp,
-      "summary": {"passed": passed, "failed": failed, "total": len(checks)},
-      "checks": [check.__dict__ for check in checks],
+        "generatedAt": timestamp,
+        "summary": {"passed": passed, "failed": failed, "total": len(checks)},
+        "checks": [check.__dict__ for check in checks],
     }
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -230,10 +168,9 @@ def write_reports(checks, report_dir: Path):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Audita que el sitio refleje el Excel y la oferta comercial Telcel.")
+    parser = argparse.ArgumentParser(description="Audita el catalogo publico saneado contra el Excel de equipos.")
     parser.add_argument("--excel", type=Path, default=DEFAULT_EXCEL)
     parser.add_argument("--site-json", type=Path, default=DEFAULT_SITE_JSON)
-    parser.add_argument("--offers", type=Path, default=DEFAULT_OFFERS)
     parser.add_argument("--report-dir", type=Path, default=DEFAULT_REPORT_DIR)
     parser.add_argument("--fail-on-diff", action="store_true")
     return parser.parse_args()
@@ -241,20 +178,17 @@ def parse_args():
 
 def main():
     args = parse_args()
-    if not args.excel.exists():
-        raise FileNotFoundError(f"Excel not found: {args.excel}")
+    excel_path = resolve_excel(args.excel)
     if not args.site_json.exists():
         raise FileNotFoundError(f"Site JSON not found: {args.site_json}")
-    if not args.offers.exists():
-        raise FileNotFoundError(f"Offer file not found: {args.offers}")
 
-    temp_path = args.report_dir / "_latest_excel_catalog.json"
-    excel_catalog = ensure_catalog_from_excel(args.excel, temp_path)
+    temp_path = args.report_dir / "_latest_public_equipment_catalog.json"
+    excel_catalog = build_catalog_from_excel(excel_path, temp_path)
     site_catalog = load_json(args.site_json)
 
     checks = []
-    checks.extend(compare_catalogs(excel_catalog, site_catalog))
-    checks.extend(audit_telcel_offer(args.offers))
+    checks.extend(compare_public_catalogs(excel_catalog, site_catalog))
+    checks.extend(audit_public_files(PUBLIC_FILES))
     json_path, md_path, failed = write_reports(checks, args.report_dir)
 
     print(f"Audit report JSON: {json_path}")

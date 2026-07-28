@@ -1,5 +1,6 @@
 import OpenAI from "openai";
-import { devices, plans } from "@/lib/data";
+import { plans } from "@/lib/data";
+import catalog from "@/public/data/equipos-catalogo.json";
 
 const client = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -9,7 +10,7 @@ export async function getAiSalesRecommendation(prompt: string) {
   if (!client) {
     return {
       recommendation:
-        "Configura OPENAI_API_KEY para activar recomendaciones inteligentes. Mientras tanto, prioriza equipo, presupuesto, cobertura y urgencia del cliente.",
+        "Configura OPENAI_API_KEY para activar recomendaciones inteligentes. Mientras tanto, prioriza modelo de interes, cobertura, urgencia del cliente y agenda una cita.",
       model: "mock"
     };
   }
@@ -20,11 +21,14 @@ export async function getAiSalesRecommendation(prompt: string) {
       {
         role: "system",
         content:
-          "Eres un asesor comercial de CelularesXalapa.com. Recomienda opciones claras, breves y orientadas a conversion sin inventar disponibilidad."
+          "Eres un asesor comercial de CelularesXalapa.com. Recomienda opciones claras, breves y orientadas a conversion. No publiques precios, enganches, pagos, stock ni disponibilidad. El siguiente paso siempre debe ser agendar una cita con un asesor."
       },
       {
         role: "user",
-        content: `Catalogo: ${JSON.stringify({ devices, plans })}\nCliente: ${prompt}`
+        content: `Catalogo publico: ${JSON.stringify({
+          equipment: catalog.items.map((item) => ({ brand: item.brand, model: item.model })).slice(0, 400),
+          plans: plans.map((plan) => ({ name: plan.name, benefits: plan.benefits }))
+        })}\nCliente: ${prompt}`
       }
     ]
   });

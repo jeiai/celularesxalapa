@@ -94,10 +94,10 @@ export const promotions: Promotion[] = [
     active: true
   },
   {
-    id: "promo-enganche",
-    title: "Enganche flexible",
-    description: "Cotiza mensualidades con diferentes anticipos y plazos.",
-    label: "Financiamiento",
+    id: "promo-asesor",
+    title: "Asesoria personalizada",
+    description: "Elige un modelo y recibe orientacion segun tu necesidad.",
+    label: "Cita guiada",
     active: true
   },
   {
@@ -111,7 +111,7 @@ export const promotions: Promotion[] = [
 
 export const stats: StatCard[] = [
   { label: "Leads nuevos", value: "128", trend: "+18%" },
-  { label: "Cotizaciones", value: "342", trend: "+24%" },
+  { label: "Solicitudes", value: "342", trend: "+24%" },
   { label: "Citas agendadas", value: "54", trend: "+11%" },
-  { label: "Inventario activo", value: "43", trend: "96%" }
+  { label: "Catalogo activo", value: "43", trend: "96%" }
 ];

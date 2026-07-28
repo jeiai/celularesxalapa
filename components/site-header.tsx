@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 
 const nav = [
   ["Catalogo", "/#catalogo"],
-  ["Precios Excel", "/precios"],
+  ["Equipos", "/precios"],
   ["Ofertas Telcel", "/ofertas-telcel"],
   ["Comparador", "/#comparador"],
-  ["Cotizador", "/#cotizador"],
+  ["Asesor", "/#cotizador"],
   ["Dashboard", "/dashboard"],
   ["Admin", "/admin"]
 ];

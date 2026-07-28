@@ -1,78 +1,56 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
-import { Filter, Search, SlidersHorizontal } from "lucide-react";
+import { CalendarDays, Search, SlidersHorizontal, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { mxn } from "@/lib/utils";
 
-type PlanOption = {
-  plan: string;
-  precio: number | null;
-  mensualidad: number | null;
-};
-
-type ExcelProduct = {
+type PublicEquipment = {
   id: string;
-  tipo: string;
-  categoria: string;
-  marca: string;
-  modelo: string;
-  tecnologia: string;
+  sourceSheet: string;
+  category: string;
+  brand: string;
+  model: string;
+  technology: string;
   color: string;
-  precioConIva: number | null;
-  precioSinIva: number | null;
-  inicio: string;
-  fin: string;
-  planes: PlanOption[];
+  validFrom: string;
+  validTo: string;
 };
 
 type CatalogPayload = {
   source: string;
+  sourceMode?: string;
   count: number;
   filters: {
-    tipos: string[];
-    marcas: string[];
-    categorias: string[];
-    planes: string[];
+    categories: string[];
+    brands: string[];
+    technologies: string[];
+    colors: string[];
   };
-  items: ExcelProduct[];
+  items: PublicEquipment[];
 };
 
 export function ExcelProductBrowser({ catalog }: { catalog: CatalogPayload }) {
-  const [tipo, setTipo] = useState("Todos");
-  const [marca, setMarca] = useState("Todas");
-  const [categoria, setCategoria] = useState("Todas");
-  const [plan, setPlan] = useState("Todos");
+  const [brand, setBrand] = useState("Todas");
   const [query, setQuery] = useState("");
   const [limit, setLimit] = useState(48);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return catalog.items.filter((item) => {
-      const matchesTipo = tipo === "Todos" || item.tipo === tipo;
-      const matchesMarca = marca === "Todas" || item.marca === marca;
-      const matchesCategoria = categoria === "Todas" || item.categoria === categoria;
-      const matchesPlan = plan === "Todos" || item.planes.some((option) => option.plan === plan);
-      const matchesQuery =
-        !q ||
-        [item.modelo, item.marca, item.categoria, item.tecnologia, item.color]
-          .join(" ")
-          .toLowerCase()
-          .includes(q);
-      return matchesTipo && matchesMarca && matchesCategoria && matchesPlan && matchesQuery;
+      const matchesBrand = brand === "Todas" || item.brand === brand;
+      const matchesQuery = !q || [item.brand, item.model].join(" ").toLowerCase().includes(q);
+      return matchesBrand && matchesQuery;
     });
-  }, [catalog.items, categoria, marca, plan, query, tipo]);
+  }, [brand, catalog.items, query]);
 
   const visible = filtered.slice(0, limit);
 
   function resetFilters() {
-    setTipo("Todos");
-    setMarca("Todas");
-    setCategoria("Todas");
-    setPlan("Todos");
+    setBrand("Todas");
     setQuery("");
     setLimit(48);
   }
@@ -81,18 +59,15 @@ export function ExcelProductBrowser({ catalog }: { catalog: CatalogPayload }) {
     <div className="grid gap-6">
       <Card>
         <CardContent className="grid gap-4 p-5">
-          <div className="grid gap-3 md:grid-cols-[1.2fr_repeat(4,1fr)_auto]">
+          <div className="grid gap-3 md:grid-cols-[1.2fr_1fr_auto]">
             <label className="grid gap-2 text-sm font-bold text-muted-foreground">
-              Buscar producto
+              Buscar marca o modelo
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="iPhone, Samsung, cargador..." />
+                <Input className="pl-9" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="iPhone, Samsung, Motorola..." />
               </div>
             </label>
-            <FilterSelect label="Tipo" value={tipo} onChange={setTipo} options={["Todos", ...catalog.filters.tipos]} />
-            <FilterSelect label="Marca" value={marca} onChange={setMarca} options={["Todas", ...catalog.filters.marcas]} />
-            <FilterSelect label="Categoría" value={categoria} onChange={setCategoria} options={["Todas", ...catalog.filters.categorias]} />
-            <FilterSelect label="Plan" value={plan} onChange={setPlan} options={["Todos", ...catalog.filters.planes]} />
+            <FilterSelect label="Marca" value={brand} onChange={setBrand} options={["Todas", ...catalog.filters.brands]} />
             <div className="flex items-end">
               <Button className="w-full" variant="outline" onClick={resetFilters}>
                 Limpiar
@@ -102,30 +77,30 @@ export function ExcelProductBrowser({ catalog }: { catalog: CatalogPayload }) {
           <div className="flex flex-wrap gap-3 text-sm font-bold text-muted-foreground">
             <span className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-2">
               <SlidersHorizontal className="size-4 text-primary" />
-              {filtered.length} resultado(s)
+              {filtered.length} modelo(s)
             </span>
             <span className="rounded-full bg-muted px-3 py-2">Fuente: {catalog.source}</span>
-            <span className="rounded-full bg-muted px-3 py-2">{catalog.count} productos interpretados</span>
+            {catalog.sourceMode === "fallback" ? <span className="rounded-full bg-red-50 px-3 py-2 text-red-700">Esperando equipos v10.xlsx</span> : null}
           </div>
         </CardContent>
       </Card>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {visible.map((item) => (
-          <ProductCard key={item.id} item={item} selectedPlan={plan} />
+          <EquipmentCard key={item.id} item={item} />
         ))}
       </div>
 
       {visible.length < filtered.length ? (
         <Button className="mx-auto" variant="secondary" onClick={() => setLimit((current) => current + 48)}>
-          Ver más productos
+          Ver mas modelos
         </Button>
       ) : null}
 
       {!filtered.length ? (
         <Card>
           <CardContent className="p-8 text-center text-muted-foreground">
-            No encontré productos con esa combinación. Prueba quitando un filtro.
+            No encontre modelos con esa busqueda. Prueba con otra marca o agenda una cita para que un asesor lo revise.
           </CardContent>
         </Card>
       ) : null}
@@ -158,46 +133,24 @@ function FilterSelect({
   );
 }
 
-function ProductCard({ item, selectedPlan }: { item: ExcelProduct; selectedPlan: string }) {
-  const planOption =
-    selectedPlan === "Todos" ? item.planes[0] : item.planes.find((option) => option.plan === selectedPlan) ?? item.planes[0];
-  const cashPrice = item.precioConIva ?? planOption?.precio ?? null;
-
+function EquipmentCard({ item }: { item: PublicEquipment }) {
   return (
     <Card className="overflow-hidden">
       <CardHeader>
-        <div className="mb-2 flex flex-wrap gap-2">
-          <span className="rounded-full bg-secondary px-3 py-1 text-xs font-extrabold text-secondary-foreground">{item.tipo}</span>
-          {item.categoria ? <span className="rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">{item.categoria}</span> : null}
+        <div className="mb-3 grid aspect-[16/10] place-items-center rounded-lg bg-muted">
+          <Smartphone className="size-14 text-primary" />
         </div>
-        <CardTitle className="text-lg">{item.modelo}</CardTitle>
-        <p className="text-sm font-semibold text-muted-foreground">
-          {item.marca || "Sin marca"} {item.tecnologia ? `· ${item.tecnologia}` : ""}
-        </p>
+        <p className="text-sm font-extrabold uppercase text-primary">{item.brand || "Marca por confirmar"}</p>
+        <CardTitle className="text-lg leading-6">{item.model}</CardTitle>
       </CardHeader>
-      <CardContent className="grid gap-4">
-        <div className="grid grid-cols-2 gap-3">
-          <PriceBox label={item.planes.length ? "Precio plan" : "Precio contado"} value={cashPrice === null ? "N/D" : mxn.format(cashPrice)} />
-          <PriceBox label="Mensualidad" value={planOption?.mensualidad === null || !planOption ? "N/D" : `${mxn.format(planOption.mensualidad)}/mes`} tone="red" />
-        </div>
-        {planOption ? (
-          <div className="rounded-lg bg-muted p-3 text-sm">
-            <span className="font-extrabold text-primary">{planOption.plan}</span>
-            <p className="mt-1 text-muted-foreground">Precio y pago mensual interpretados desde la hoja de postpago.</p>
-          </div>
-        ) : null}
-        {item.color ? <p className="text-sm text-muted-foreground">Color: {item.color}</p> : null}
-        {item.fin ? <p className="text-sm text-muted-foreground">Vigencia: {item.fin}</p> : null}
+      <CardContent>
+        <Button asChild className="w-full" variant="dark">
+          <Link href="/agenda">
+            <CalendarDays className="mr-2 size-4" />
+            Agendar cita
+          </Link>
+        </Button>
       </CardContent>
     </Card>
-  );
-}
-
-function PriceBox({ label, value, tone = "blue" }: { label: string; value: string; tone?: "blue" | "red" }) {
-  return (
-    <div className="rounded-lg border bg-white p-3">
-      <span className="text-xs font-extrabold uppercase text-muted-foreground">{label}</span>
-      <strong className={tone === "red" ? "mt-1 block text-xl text-red-600" : "mt-1 block text-xl text-primary"}>{value}</strong>
-    </div>
   );
 }

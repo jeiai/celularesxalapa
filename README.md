@@ -41,7 +41,9 @@ La app deja puntos preparados para Meta Ads, Google Ads, analytics y agentes de 
 
 ## Auditor de contenido
 
-Usa este agente auditor cada vez que cambie el Excel de precios, la oferta comercial Telcel o el contenido publicado del sitio.
+Usa este agente auditor cada vez que cambie `equipos v10.xlsx`, la oferta comercial Telcel o el contenido publicado del sitio.
+
+Politica publica actual: el sitio no debe mostrar precios del equipo, montos de enganche, pagos mensuales, diferencias, disponibilidad, stock ni condiciones economicas del Excel. Las vistas publicas deben mostrar solo marcas y modelos de equipos; el siguiente paso del usuario es agendar una cita con un asesor.
 
 Comando:
 
@@ -51,10 +53,11 @@ python tools/audit_site_content.py
 
 Que valida:
 
-- Regenera una interpretacion temporal del Excel original.
-- Compara el Excel contra `public/data/catalogo-excel.json`.
-- Revisa conteos, tipos comerciales, planes, productos faltantes y una muestra de precios.
-- Revisa que `lib/telcel-offers.ts` incluya Portabilidad, doble GB, 50% mas gigas, Planes Ultra, Planes Libre, WiFi Telcel y vigencia.
+- Regenera una interpretacion temporal del Excel `equipos v10.xlsx`.
+- Si `equipos v10.xlsx` todavia no existe, usa temporalmente `V7.10    GENERAL .xlsx` como respaldo local.
+- Compara el Excel contra `public/data/equipos-catalogo.json`.
+- Revisa que el JSON publico no tenga columnas o llaves economicas.
+- Revisa vistas publicas y API publica para detectar precios, enganches, pagos, stock o disponibilidad.
 - Genera reportes en `reports/`.
 
 Para usarlo como control antes de publicar cambios:

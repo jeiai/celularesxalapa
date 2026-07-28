@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { calculateQuote } from "@/lib/quote";
+import catalog from "@/public/data/equipos-catalogo.json";
 
 const quoteSchema = z.object({
-  deviceSlug: z.string(),
-  planId: z.string().optional(),
-  downPayment: z.coerce.number().min(0).default(0),
-  months: z.coerce.number().min(1).max(36).default(18),
+  equipmentId: z.string().optional(),
+  brand: z.string().optional(),
+  model: z.string().optional(),
+  intent: z.string().optional(),
   leadPhone: z.string().optional()
 });
 
@@ -17,10 +17,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: payload.error.flatten() }, { status: 400 });
   }
 
-  const quote = calculateQuote(payload.data);
+  const selected = payload.data.equipmentId
+    ? catalog.items.find((item) => item.id === payload.data.equipmentId)
+    : undefined;
 
   return NextResponse.json({
-    quote,
-    persistence: "Connect prisma.quote.create after DATABASE_URL is configured."
+    request: {
+      brand: selected?.brand ?? payload.data.brand ?? "",
+      model: selected?.model ?? payload.data.model ?? "",
+      intent: payload.data.intent ?? "Agendar asesoria",
+      leadPhone: payload.data.leadPhone ?? ""
+    },
+    nextStep: "Agendar una cita con un asesor.",
+    persistence: "Connect prisma.appointment or prisma.lead after DATABASE_URL is configured."
   });
 }

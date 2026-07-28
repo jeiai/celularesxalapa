@@ -4,8 +4,7 @@ import { useMemo, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mxn } from "@/lib/utils";
-import { telcelOfferCampaign, type TelcelOfferGroup, type TelcelPricePoint } from "@/lib/telcel-offers";
+import { telcelOfferCampaign, type TelcelOfferGroup, type TelcelOfferPoint } from "@/lib/telcel-offers";
 
 export function TelcelOfferTabs() {
   const [selectedId, setSelectedId] = useState(telcelOfferCampaign.groups[0].id);
@@ -54,39 +53,27 @@ function OfferGroup({ group }: { group: TelcelOfferGroup }) {
         </CardContent>
       </Card>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {group.pricePoints.map((point) => (
-          <PlanPriceCard key={`${group.id}-${point.name}`} point={point} />
+        {group.offerPoints.map((point) => (
+          <OfferDetailCard key={`${group.id}-${point.name}`} point={point} />
         ))}
       </div>
     </div>
   );
 }
 
-function PlanPriceCard({ point }: { point: TelcelPricePoint }) {
+function OfferDetailCard({ point }: { point: TelcelOfferPoint }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">{point.name}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-3">
-        {point.price ? <PriceLine label="Precio" value={mxn.format(point.price)} /> : null}
-        {point.openPrice ? <PriceLine label="Abierto" value={mxn.format(point.openPrice)} /> : null}
-        {point.controlledPrice ? <PriceLine label="Controlado" value={mxn.format(point.controlledPrice)} /> : null}
         {point.includedGb ? <Pill label="GB incluidos" value={point.includedGb} /> : null}
         {point.promoGb ? <Pill label="Promocion" value={point.promoGb} accent /> : null}
-        {point.cashback ? <Pill label="Cashback" value={point.cashback} /> : null}
         {point.note ? <p className="text-sm font-semibold text-muted-foreground">{point.note}</p> : null}
+        <p className="text-sm font-semibold text-muted-foreground">Agenda una cita para validar el beneficio aplicable.</p>
       </CardContent>
     </Card>
-  );
-}
-
-function PriceLine({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border bg-white p-3">
-      <span className="text-xs font-extrabold uppercase text-muted-foreground">{label}</span>
-      <strong className="mt-1 block text-2xl text-primary">{value}</strong>
-    </div>
   );
 }
 

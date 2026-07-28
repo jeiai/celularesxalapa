@@ -1,17 +1,24 @@
 import Link from "next/link";
 import { BarChart3, Boxes, CalendarCheck, Contact, Megaphone, ShieldCheck } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { plans, stats } from "@/lib/data";
-import { mxn } from "@/lib/utils";
+import { plans } from "@/lib/data";
+import catalog from "@/public/data/equipos-catalogo.json";
 
 const modules = [
   { title: "CRM", href: "/crm", icon: Contact, text: "Leads, estados, origen y seguimiento comercial." },
-  { title: "Dashboard", href: "/dashboard", icon: BarChart3, text: "KPIs de ventas, citas, cotizaciones e inventario." },
+  { title: "Dashboard", href: "/dashboard", icon: BarChart3, text: "KPIs de citas, canales, solicitudes y seguimiento." },
   { title: "Agenda", href: "/agenda", icon: CalendarCheck, text: "Citas por canal, asesor y etapa de venta." },
-  { title: "Admin", href: "/admin", icon: ShieldCheck, text: "Roles, promociones, planes, inventario y blog." },
-  { title: "Inventario", href: "/admin", icon: Boxes, text: "Stock, precios, condiciones y destacados." },
+  { title: "Admin", href: "/admin", icon: ShieldCheck, text: "Roles, promociones, planes, catalogo interno y blog." },
+  { title: "Catalogo interno", href: "/admin", icon: Boxes, text: "Fuente operativa para marcas, modelos y validaciones con asesor." },
   { title: "Ads e IA", href: "/dashboard", icon: Megaphone, text: "Hooks para Meta Ads, Google Ads y agentes de IA." }
+];
+
+const operationalStats = [
+  { label: "Modelos publicados", value: catalog.count, trend: "Solo marca y modelo" },
+  { label: "Marcas", value: catalog.filters.brands.length, trend: "Desde Excel" },
+  { label: "Flujo recomendado", value: "Cita", trend: "Atencion personalizada" },
+  { label: "Integraciones", value: "IA", trend: "Preparado para Ads" }
 ];
 
 export function PlansAndOperations() {
@@ -20,10 +27,10 @@ export function PlansAndOperations() {
       <section id="planes" className="section-pad">
         <div className="container grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
           <div>
-            <p className="mb-3 text-xs font-extrabold uppercase text-primary">Gestión de planes</p>
-            <h2 className="text-4xl font-extrabold md:text-6xl">Planes claros para vender más rápido.</h2>
+            <p className="mb-3 text-xs font-extrabold uppercase text-primary">Gestion de planes</p>
+            <h2 className="text-4xl font-extrabold md:text-6xl">Planes Telcel para revisar con asesor.</h2>
             <p className="mt-4 text-muted-foreground">
-              Los planes viven en una capa de datos reusable para API, cotizador y administración.
+              La pagina presenta las familias de planes y beneficios generales. La seleccion final se confirma en cita.
             </p>
           </div>
           <div className="grid gap-3">
@@ -32,11 +39,11 @@ export function PlansAndOperations() {
                 <CardContent className="grid gap-3 p-5 md:grid-cols-[1fr_auto] md:items-center">
                   <div>
                     <strong>{plan.name}</strong>
-                    <p className="text-sm text-muted-foreground">
-                      {plan.dataGb} GB · {plan.benefits.join(" · ")}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{plan.benefits.join(" - ")}</p>
                   </div>
-                  <strong className="text-xl">{mxn.format(plan.monthlyFee)}/mes</strong>
+                  <Button asChild variant="outline">
+                    <Link href="/agenda">Agendar cita</Link>
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -48,15 +55,15 @@ export function PlansAndOperations() {
         <div className="container">
           <div className="mb-8 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
-              <p className="mb-3 text-xs font-extrabold uppercase text-blue-300">Operación full-stack</p>
-              <h2 className="text-4xl font-extrabold md:text-6xl">CRM, dashboard y administración.</h2>
+              <p className="mb-3 text-xs font-extrabold uppercase text-blue-300">Operacion full-stack</p>
+              <h2 className="text-4xl font-extrabold md:text-6xl">CRM, dashboard y administracion.</h2>
             </div>
             <Button asChild variant="secondary">
               <Link href="/dashboard">Abrir dashboard</Link>
             </Button>
           </div>
           <div className="mb-4 grid gap-4 md:grid-cols-4">
-            {stats.map((stat) => (
+            {operationalStats.map((stat) => (
               <div key={stat.label} className="rounded-lg border border-white/10 bg-white/5 p-5">
                 <span className="text-sm text-white/60">{stat.label}</span>
                 <strong className="mt-2 block text-3xl">{stat.value}</strong>

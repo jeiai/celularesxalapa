@@ -42,12 +42,12 @@ export function SiteHeader() {
 
         <nav className="flex items-center gap-2 overflow-x-auto text-sm font-bold lg:justify-end">
           {nav.map(([label, href]) => (
-            <Link key={href} href={href} className="whitespace-nowrap rounded-lg px-3 py-2 hover:bg-muted">
+            <Link key={href} href={href} className="max-w-24 rounded-lg px-3 py-2 text-center leading-4 hover:bg-muted">
               {label}
             </Link>
           ))}
           <Button asChild variant="dark" size="sm">
-            <Link href="/agenda">
+            <Link href="/agenda" className="max-w-24 whitespace-normal text-center leading-4">
               <CalendarDays className="mr-2 size-4" />
               Agenda Cita
             </Link>

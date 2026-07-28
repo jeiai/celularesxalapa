@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   description:
     "Aplicación full-stack para venta de celulares, planes, portabilidades, internet, CRM, dashboard, agenda y administración en Xalapa.",
   keywords: ["celulares xalapa", "planes celulares", "portabilidad", "internet telmex", "smartphones xalapa"],
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg"
+  },
   openGraph: {
     title: "CelularesXalapa.com",
     description: "Celulares, planes, cotizador inteligente y CRM comercial.",

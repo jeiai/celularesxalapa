@@ -86,7 +86,7 @@ def extract_items(path):
             color = get_cell(row, color_index)
             valid_from = get_cell(row, start_index)
             valid_to = get_cell(row, end_index)
-            key = (normalize(category), normalize(brand), normalize(model), normalize(technology), normalize(color))
+            key = (normalize(brand), normalize(model))
             if key in seen:
                 continue
             seen.add(key)

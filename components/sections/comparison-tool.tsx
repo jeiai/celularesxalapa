@@ -3,11 +3,11 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { CalendarDays, Smartphone } from "lucide-react";
+import { CatalogEquipmentVisual } from "@/components/catalog-equipment-visual";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select } from "@/components/ui/select";
 import catalog from "@/public/data/equipos-catalogo.json";
-import { getCatalogImage } from "@/lib/catalog-images";
 
 const models = catalog.items.slice(0, 240);
 
@@ -63,12 +63,10 @@ function ModelSelect({ label, value, onChange }: { label: string; value: string;
 }
 
 function ModelSummary({ title, item }: { title: string; item?: (typeof models)[number] }) {
-  const image = getCatalogImage(item?.brand, item?.model);
-
   return (
     <div className="rounded-lg bg-muted p-4">
-      <div className="mb-3 overflow-hidden rounded-lg bg-white">
-        <img src={image.src} alt={image.alt} loading="lazy" className="aspect-[16/9] w-full object-cover" />
+      <div className="mb-3">
+        <CatalogEquipmentVisual brand={item?.brand} model={item?.model} />
       </div>
       <div className="mb-3 flex items-center gap-2 text-xs font-extrabold uppercase text-primary">
         <Smartphone className="size-4" />

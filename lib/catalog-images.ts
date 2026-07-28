@@ -1,38 +1,58 @@
 type CatalogImage = {
-  match: RegExp;
   src: string;
   alt: string;
 };
 
-const catalogImages: CatalogImage[] = [
+const exactModelImages: Array<{
+  matches: RegExp;
+  image: CatalogImage;
+}> = [
   {
-    match: /APPLE|IPHONE|IPAD/i,
-    src: "https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?auto=format&fit=crop&w=900&q=80",
-    alt: "Smartphone blanco en fondo minimalista"
+    matches: /^APPLE .*IPHONE 16 128GB$/i,
+    image: {
+      src: "https://fdn2.gsmarena.com/vv/bigpic/apple-iphone-16.jpg",
+      alt: "Apple iPhone 16"
+    }
   },
   {
-    match: /SAMSUNG|GALAXY/i,
-    src: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=900&q=80",
-    alt: "Smartphone moderno con camara posterior"
+    matches: /^APPLE .*IPHONE 15 128GB$/i,
+    image: {
+      src: "https://fdn2.gsmarena.com/vv/bigpic/apple-iphone-15.jpg",
+      alt: "Apple iPhone 15"
+    }
   },
   {
-    match: /MOTOROLA|MOTO|NOKIA|ZTE|TCL|ALCATEL/i,
-    src: "https://images.unsplash.com/photo-1556656793-08538906a9f8?auto=format&fit=crop&w=900&q=80",
-    alt: "Smartphone moderno sobre fondo claro"
+    matches: /^SAMSUNG .*GALAXY S24 FE 128GB$/i,
+    image: {
+      src: "https://fdn2.gsmarena.com/vv/bigpic/samsung-galaxy-s24-fe.jpg",
+      alt: "Samsung Galaxy S24 FE"
+    }
   },
   {
-    match: /XIAOMI|REDMI|POCO|HONOR|HUAWEI|OPPO|REALME|VIVO|TECNO|INFINIX/i,
-    src: "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?auto=format&fit=crop&w=900&q=80",
-    alt: "Smartphone Android en presentacion de catalogo"
+    matches: /^MOTOROLA .*MOTO G04$/i,
+    image: {
+      src: "https://fdn2.gsmarena.com/vv/bigpic/motorola-moto-g04.jpg",
+      alt: "Motorola Moto G04"
+    }
+  },
+  {
+    matches: /^XIAOMI .*REDMI NOTE 11$/i,
+    image: {
+      src: "https://fdn2.gsmarena.com/vv/bigpic/xiaomi-redmi-note-11.jpg",
+      alt: "Xiaomi Redmi Note 11"
+    }
   }
 ];
 
-const fallbackImage = {
-  src: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=80",
-  alt: "Smartphone moderno en uso"
-};
+function normalize(value = "") {
+  return value.replace(/\s+/g, " ").trim().toUpperCase();
+}
 
 export function getCatalogImage(brand = "", model = "") {
-  const text = `${brand} ${model}`;
-  return catalogImages.find((image) => image.match.test(text)) ?? fallbackImage;
+  const text = normalize(`${brand} ${model}`);
+  return exactModelImages.find((entry) => entry.matches.test(text))?.image ?? null;
+}
+
+export function hasExactCatalogImage(brand = "", model = "") {
+  return Boolean(getCatalogImage(brand, model));
 }

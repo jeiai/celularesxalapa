@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { CalendarDays, Search, SlidersHorizontal, Smartphone } from "lucide-react";
+import { CatalogEquipmentVisual } from "@/components/catalog-equipment-visual";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { getCatalogImage } from "@/lib/catalog-images";
 
 type PublicEquipment = {
   id: string;
@@ -135,17 +135,15 @@ function FilterSelect({
 }
 
 function EquipmentCard({ item }: { item: PublicEquipment }) {
-  const image = getCatalogImage(item.brand, item.model);
-
   return (
     <Card className="overflow-hidden">
       <CardHeader>
-        <div className="mb-3 overflow-hidden rounded-lg bg-muted">
-          <img src={image.src} alt={image.alt} loading="lazy" className="aspect-[16/10] w-full object-cover" />
+        <div className="mb-3">
+          <CatalogEquipmentVisual brand={item.brand} model={item.model} />
         </div>
         <div className="mb-2 inline-flex w-fit items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs font-bold text-muted-foreground">
           <Smartphone className="size-3.5 text-primary" />
-          Imagen referencial
+          Marca y modelo
         </div>
         <p className="text-sm font-extrabold uppercase text-primary">{item.brand || "Marca por confirmar"}</p>
         <CardTitle className="text-lg leading-6">{item.model}</CardTitle>

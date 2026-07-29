@@ -7,9 +7,7 @@ const nav = [
   ["Equipos", "/precios"],
   ["Cambiate a Telcel", "/ofertas-telcel"],
   ["Comparador", "/#comparador"],
-  ["Asesor", "/#cotizador"],
-  ["Dashboard", "/dashboard"],
-  ["Admin", "/admin"]
+  ["Asesor", "/#cotizador"]
 ];
 
 export function SiteHeader() {

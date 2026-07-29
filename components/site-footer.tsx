@@ -14,7 +14,6 @@ export function SiteFooter() {
           <Link href="/ofertas-telcel">Ofertas Telcel</Link>
           <Link href="/blog">Blog</Link>
           <Link href="/crm">CRM</Link>
-          <Link href="/admin">Admin</Link>
           <Link href="/api/catalog">API</Link>
         </div>
       </div>

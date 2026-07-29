@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const protectedRoutes = ["/dashboard", "/admin", "/crm"];
+const protectedRoutes = ["/crm"];
 
 export function middleware(request: NextRequest) {
   const isProtected = protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route));
@@ -18,5 +18,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/crm/:path*"]
+  matcher: ["/crm/:path*"]
 };

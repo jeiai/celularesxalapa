@@ -13,7 +13,7 @@ const nav = [
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b bg-white/88 px-4 py-3 backdrop-blur-xl md:px-8">
-      <div className="mx-auto grid max-w-7xl items-center gap-3 lg:grid-cols-[auto_minmax(260px,520px)_auto]">
+      <div className="mx-auto grid max-w-7xl items-center gap-3 md:grid-cols-[auto_minmax(260px,1fr)]">
         <Link href="/" className="flex items-center gap-2 font-extrabold">
           <span className="grid size-9 place-items-center rounded-lg bg-gradient-to-br from-blue-600 to-red-600 text-white">
             <Smartphone className="size-5" />
@@ -38,14 +38,14 @@ export function SiteHeader() {
           </Button>
         </form>
 
-        <nav className="flex items-center gap-2 overflow-x-auto text-sm font-bold lg:justify-end">
+        <nav className="flex flex-wrap items-center justify-center gap-2 text-sm font-bold md:col-span-2">
           {nav.map(([label, href]) => (
-            <Link key={href} href={href} className="max-w-24 rounded-lg px-3 py-2 text-center leading-4 hover:bg-muted">
+            <Link key={href} href={href} className="rounded-lg px-3 py-2 text-center leading-4 hover:bg-muted">
               {label}
             </Link>
           ))}
           <Button asChild variant="dark" size="sm">
-            <Link href="/agenda" className="max-w-24 whitespace-normal text-center leading-4">
+            <Link href="/agenda" className="whitespace-normal text-center leading-4">
               <CalendarDays className="mr-2 size-4" />
               Agenda Cita
             </Link>

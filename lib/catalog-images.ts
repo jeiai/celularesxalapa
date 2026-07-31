@@ -8,6 +8,13 @@ const exactModelImages: Array<{
   image: CatalogImage;
 }> = [
   {
+    matches: /^ACER .*3G A60 SOSPIRO$/i,
+    image: {
+      src: "https://xphone24.com/foto/acer_sospiro_a60.png",
+      alt: "Acer Sospiro A60"
+    }
+  },
+  {
     matches: /^APPLE .*IPHONE 16 128GB$/i,
     image: {
       src: "https://fdn2.gsmarena.com/vv/bigpic/apple-iphone-16.jpg",

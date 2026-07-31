@@ -3,11 +3,10 @@ import { CalendarDays, Search, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const nav = [
-  ["Catalogo", "/#catalogo"],
+  ["Ofertas", "/#ofertas-telcel"],
   ["Equipos", "/precios"],
-  ["Cambiate a Telcel", "/ofertas-telcel"],
-  ["Comparador", "/#comparador"],
-  ["Asesor", "/#cotizador"]
+  ["Planes", "/#planes"],
+  ["Cita", "/agenda"]
 ];
 
 export function SiteHeader() {

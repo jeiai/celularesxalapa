@@ -90,7 +90,7 @@ export const promotions: Promotion[] = [
     id: "promo-porta",
     title: "Bono por portabilidad",
     description: "Cambia de compania y recibe asesoria completa para conservar tu numero.",
-    label: "Alta conversion",
+    label: "Conserva tu numero",
     active: true
   },
   {

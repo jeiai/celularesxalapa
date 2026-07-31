@@ -7,14 +7,13 @@ export function SiteFooter() {
         <div>
           <strong>CelularesXalapa.com</strong>
           <p className="mt-2 max-w-xl text-sm leading-6 text-white/70">
-            Plataforma comercial para celulares, planes, portabilidades, internet, CRM y operaciones locales.
+            Celulares, planes Telcel, portabilidades e internet para Xalapa y alrededores.
           </p>
         </div>
         <div className="flex flex-wrap gap-4 text-sm font-bold">
           <Link href="/ofertas-telcel">Ofertas Telcel</Link>
-          <Link href="/blog">Blog</Link>
-          <Link href="/crm">CRM</Link>
-          <Link href="/api/catalog">API</Link>
+          <Link href="/precios">Equipos</Link>
+          <Link href="/agenda">Agendar cita</Link>
         </div>
       </div>
     </footer>

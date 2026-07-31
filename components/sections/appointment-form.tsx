@@ -18,7 +18,7 @@ export function AppointmentForm() {
       body: JSON.stringify(Object.fromEntries(formData)),
       headers: { "Content-Type": "application/json" }
     });
-    setMessage(response.ok ? "Solicitud registrada. Lista para conectar con WhatsApp/CRM." : "No se pudo registrar.");
+    setMessage(response.ok ? "Gracias. Te contactaremos para confirmar tu cita." : "No se pudo registrar.");
   }
 
   return (
@@ -26,9 +26,9 @@ export function AppointmentForm() {
       <div className="container grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
         <div>
           <p className="mb-3 text-xs font-extrabold uppercase text-primary">Agenda una cita</p>
-          <h2 className="text-4xl font-extrabold md:text-6xl">Convierte interes en conversacion.</h2>
+          <h2 className="text-4xl font-extrabold md:text-6xl">Agenda tu cita hoy.</h2>
           <p className="mt-4 text-muted-foreground">
-            El formulario crea leads por API REST y queda preparado para notificaciones por WhatsApp Business.
+            Dejanos tus datos y un asesor te contactara para revisar equipos, planes o portabilidad.
           </p>
         </div>
         <Card>

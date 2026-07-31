@@ -10,15 +10,26 @@ import { Select } from "@/components/ui/select";
 export function AppointmentForm() {
   const [message, setMessage] = useState("");
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const response = await fetch("/api/crm", {
-      method: "POST",
-      body: JSON.stringify(Object.fromEntries(formData)),
-      headers: { "Content-Type": "application/json" }
-    });
-    setMessage(response.ok ? "Gracias. Te contactaremos para confirmar tu cita." : "No se pudo registrar.");
+    const name = String(formData.get("name") ?? "");
+    const phone = String(formData.get("phone") ?? "");
+    const email = String(formData.get("email") ?? "");
+    const interest = String(formData.get("interest") ?? "");
+    const whatsappMessage = [
+      "Hola Josue, quiero agendar una cita.",
+      "",
+      `Nombre: ${name}`,
+      `WhatsApp: ${phone}`,
+      email ? `Correo: ${email}` : "",
+      `Interes: ${interest}`
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.open(`http://wa.link/josuetelcel?text=${encodeURIComponent(whatsappMessage)}`, "_blank", "noopener,noreferrer");
+    setMessage("Se abrio WhatsApp con tu solicitud lista para enviar.");
   }
 
   return (

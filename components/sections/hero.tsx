@@ -29,10 +29,13 @@ export function Hero() {
             </Button>
           </div>
           <div className="mt-7 flex flex-wrap gap-3 text-sm font-bold">
-            <span className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2">
+            <Link
+              href="http://wa.link/josuetelcel"
+              className="inline-flex items-center gap-2 rounded-full border bg-white px-4 py-2 transition hover:bg-muted"
+            >
               <MessageCircle className="size-4 text-primary" />
               WhatsApp 2281 03 5245
-            </span>
+            </Link>
             <span className="rounded-full border bg-white px-4 py-2">Atencion en Xalapa y alrededores</span>
           </div>
         </div>
